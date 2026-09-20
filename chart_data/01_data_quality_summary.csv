@@ -1,0 +1,12 @@
+Metric,Value
+Total flight records,7043316
+Start date,2025-07-01
+End date,2026-06-30
+Airlines,14
+Origin airports,358
+Destination airports,358
+Valid arrival records,6896283
+Flights delayed >=15 min,1546047
+Arrival delay rate,0.22418555038997096
+Cancelled flights,127324
+Cancellation rate,0.0180772806445146
