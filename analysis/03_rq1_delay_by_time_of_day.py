@@ -5,7 +5,7 @@ Chart:
 Arrival delay rate and late-aircraft share by scheduled departure time.
 
 Purpose:
-Show that delay risk rises throughout the day and that
+Examine how delay risk varies across the day and how
 Late Aircraft Delay becomes increasingly important later in the day.
 
 Interpretation:
@@ -248,7 +248,7 @@ def short_time_label(block):
     start = str(block).split("-")[0]
 
     if start == "0001":
-        return "00-05"
+        return "00:01-05:59"
 
     hour = int(start) // 100
 
@@ -312,7 +312,7 @@ ax1.fill_between(
 )
 
 ax1.set_title(
-    "Flights get progressively less reliable",
+    "Delay risk peaks in the evening, then declines",
     loc="left",
     fontsize=14,
     fontweight="bold",
@@ -324,7 +324,7 @@ ax1.set_ylabel(
 )
 
 ax1.set_xlabel(
-    "Scheduled departure hour"
+    "Scheduled local departure block"
 )
 
 ax1.yaxis.set_major_formatter(
@@ -403,7 +403,7 @@ ax2.fill_between(
 )
 
 ax2.set_title(
-    "Late aircraft increasingly dominate delay minutes",
+    "Late-aircraft share peaks in the evening",
     loc="left",
     fontsize=14,
     fontweight="bold",
@@ -415,7 +415,7 @@ ax2.set_ylabel(
 )
 
 ax2.set_xlabel(
-    "Scheduled departure hour"
+    "Scheduled local departure block"
 )
 
 ax2.yaxis.set_major_formatter(
@@ -463,7 +463,7 @@ ax2.annotate(
 # =========================================================
 
 fig.suptitle(
-    "Delay risk builds through the day—and late aircraft become increasingly important",
+    "Delay risk rises toward evening, then falls late at night",
     fontsize=18,
     fontweight="bold",
     x=0.06,
@@ -475,8 +475,8 @@ fig.text(
     0.06,
     0.94,
     (
-        "Morning flights begin with relatively little accumulated disruption; "
-        "later flights operate in a system that has already experienced delays."
+        "Observed patterns are consistent with network delay accumulation; "
+        "these associations do not establish the cause of each delay."
     ),
     fontsize=10,
     color=GRAY
@@ -487,11 +487,17 @@ fig.text(
     -0.01,
     SOURCE_NOTE
     + " Delay = arrival >=15 minutes. "
-      "Cause shares use recorded BTS delay minutes.",
+      "Cause shares use recorded BTS delay minutes. 00:01-05:59 is a combined block.",
     fontsize=8,
     color=GRAY
 )
 
+
+for ax in axes:
+    ax.tick_params(axis="x", labelrotation=45, labelsize=9)
+    for label in ax.get_xticklabels():
+        label.set_horizontalalignment("right")
+    ax.set_ylim(bottom=0)
 
 plt.tight_layout(
     rect=[0.04, 0.05, 0.98, 0.90]

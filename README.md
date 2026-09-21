@@ -13,9 +13,15 @@ Rather than simply ranking airlines or airports, the project focuses on a broade
 
 ---
 
+## Who this is for
+
+This project is for U.S. domestic travelers with time-sensitive plans and some choice of departure time. For example, a missed connection could disrupt an appointment or work commitment; this is an illustrative scenario, not a passenger story observed in these data.
+
+The figures describe historical associations. An earlier flight can be worth considering, but it is not a guarantee and may bring additional transport, lodging or care costs.
+
 ## Research Questions
 
-The project is organized around six connected questions:
+The project is organized around seven connected questions:
 
 1. **When do delays happen?**
    - How does delay risk vary by month and time of day?
@@ -37,6 +43,9 @@ The project is organized around six connected questions:
 
 6. **Can delayed flights recover time?**
    - Do longer flights recover more delay before arrival?
+
+7. **Does the time pattern survive a broader definition of disruption?**
+   - When cancellations and diversions are included, do early departures still look more reliable?
 
 ---
 
@@ -67,7 +76,7 @@ The primary analysis file is:
 data/bts_2025_07_to_2026_06.csv
 ```
 
-Because the merged CSV is approximately **1.5 GB**, it is not stored directly in the Git repository. The full processed dataset is distributed separately through **GitHub Releases**.
+Because the merged CSV is approximately **1.5 GB**, it is not stored directly in the Git repository. The merged dataset (not a fully cleaned dataset) is distributed separately through **GitHub Releases**.
 
 ---
 
@@ -120,7 +129,10 @@ us-flight-delay-analysis/
 │   ├── 08_rq4_airport_delay_rates.py
 │   ├── 09_rq4_airport_delay_fingerprints.py
 │   ├── 10_rq5_best_time_to_fly.py
-│   └── 11_rq6_delay_recovery_by_distance.py
+│   ├── 11_rq6_delay_recovery_by_distance.py
+│   ├── 12_flight_outcomes_by_time.py
+│   ├── _flight_outcomes.py
+│   └── _quality.py
 │
 ├── chart_data/
 │   ├── 01_data_quality_summary.csv
@@ -184,8 +196,11 @@ final visualization
 | 09 | RQ4: Airports | Airport delay fingerprints |
 | 10 | RQ5: When to fly? | Day × departure-time heatmap |
 | 11 | RQ6: Recovery | Delay recovery by flight distance |
+| 12 | RQ7: Passenger outcomes | All-record outcome shares by scheduled departure block |
 
 ---
+
+Additional files: `tests/` contains small regression fixtures; [methods and reproduction details](docs/METHODS.md) describe quality reports, outcome definitions, all 40 source fields and rebuilding from monthly ZIPs.
 
 ## Main Findings
 
@@ -197,15 +212,17 @@ Monthly delay rates also vary noticeably, showing that delay risk is not constan
 
 ---
 
-### 2. Delay risk increases strongly through the day
+### 2. Delay risk rises toward evening, then declines
 
 Morning flights have the lowest observed delay rates.
 
-Delay risk rises steadily through the afternoon and evening, reaching roughly **30% or more** during several evening departure periods.
+Among flights with valid arrival-delay records, the rate rises from **9.9% at 06:00–06:59** to **32.5% at 19:00–19:59**, then falls to **19.8% at 23:00–23:59**. It does not increase throughout the entire day.
 
 At the same time, the share of delay minutes attributed to **Late Aircraft Delay** also increases later in the day.
 
-This pattern is consistent with disruption accumulating as aircraft move through multiple flights during the day.
+This pattern is consistent with disruption accumulating as aircraft move through multiple flights during the day. It does not identify the cause of each evening delay.
+
+![Arrival delay and recorded late-aircraft minutes by scheduled departure block](charts/03_rq1_delay_by_time_of_day.png)
 
 ---
 
@@ -223,7 +240,9 @@ Recorded delay minutes are approximately distributed as:
 
 Late Aircraft is the largest source of recorded delay minutes.
 
-However, **weather accounts for roughly 63% of coded cancellations**.
+However, **weather accounts for roughly 63% of coded cancellations**. Cause shares use recorded delay minutes; cancellation shares use coded cancellations, a different denominator. The Weather category should not be interpreted as a measurement of all system-wide weather impacts.
+
+![Recorded delay-minute causes compared with coded cancellation causes](charts/04_rq2_delay_vs_cancellation_causes.png)
 
 This creates an important distinction:
 
@@ -261,7 +280,9 @@ The same observed delay rate can therefore reflect different operational problem
 
 Major U.S. airports also show large differences in delay rates.
 
-Among large airports in the dataset, observed arrival-delay rates range from approximately **15% to 29%**.
+Among large airports in the dataset, observed arrival-delay rates range from approximately **15% to 29%**. These are final arrival-delay rates for flights **departing** each origin airport, not the percentage of delays caused by that airport. Airline and airport rankings do not control for route, departure time, season or network differences, so they are not causal rankings of management quality.
+
+![Final arrival delay rates for flights departing major airports](charts/08_rq4_airport_delay_rates.png)
 
 Airport delay fingerprints further show that different hubs experience different combinations of network, carrier, weather, and airspace-related delays.
 
@@ -295,11 +316,30 @@ Longer flights recover somewhat more delay before arrival, although the effect i
 
 ---
 
+### 9. Including cancellations and diversions preserves the broad time pattern
+
+The new `flight_outcome` feature assigns every record to one of five mutually exclusive categories. The full-data run counted 5,350,236 completed flights not delayed by 15 minutes, 1,546,047 completed delayed flights, 127,324 cancellations, 19,708 diversions and **1 unknown/inconsistent record**.
+
+| Scheduled local departure block | Previous arrival-delay rate¹ | Combined disruption rate² |
+|---|---:|---:|
+| 00:01–05:59 (combined block) | 9.0% | 10.7% |
+| 06:00–06:59 | 9.9% | 11.7% |
+| 19:00–19:59 | 32.5% | 34.3% |
+| 23:00–23:59 | 19.8% | 21.2% |
+
+¹ Denominator: records with a valid arrival-delay flag. ² Denominator: **all records in the block**; numerator: completed delayed flights + cancellations + diversions. These disruptions have different passenger impacts; summing them does not make their costs equivalent. Unknowns remain in the denominator and are shown separately.
+
+![All flight outcomes and smaller disruption categories by departure block](charts/12_flight_outcomes_by_time.png)
+
+The broader measure still rises toward evening and falls late at night. This supports a bounded practical suggestion to consider earlier departures when feasible, not a claim that rescheduling any individual flight will produce the same improvement. The underlying data contain no unknown departure blocks; the code retains such a block whenever one occurs.
+
+Sources: [by-time counts](chart_data/12_flight_outcomes_by_time.csv), [global counts](chart_data/12_flight_outcomes_global.csv), [classification checks](chart_data/12_flight_outcomes_checks.csv).
+
 ## Methodology
 
 ### Arrival Delay Rate
 
-Arrival delay rate is calculated using flights with a valid `ARR_DEL15` value:
+Arrival delay rate is calculated using flights with `ARR_DEL15` equal to 0 or 1. The older analysis scripts select nonmissing flags; the new full-data audit verified that all nonmissing flags in this release are legal, making these selections equivalent for this release:
 
 ```text
 Arrival Delay Rate
@@ -310,6 +350,20 @@ Flights with valid ARR_DEL15
 ```
 
 Cancelled flights are therefore not counted as normal on-time arrivals.
+
+### Data quality and preprocessing
+
+The full Release CSV was audited on September 20, 2026: **7,043,316 rows, 40 fields, all 365 expected dates and 12 expected months**. No invalid 0/1 flags, completed-arrival minute/flag conflicts, out-of-range dates, full-row hash repeats or candidate-flight-key hash repeats were found. One noncancelled, nondiverted record lacks `ARR_DEL15` and `ARR_DELAY`; it is retained as unknown, not treated as on time.
+
+See [detailed checks](chart_data/01_data_quality_checks.csv), [monthly counts](chart_data/01_data_quality_monthly_counts.csv) and [missing-date report](chart_data/01_data_quality_missing_dates.csv). Empty missing-date output means no dates were missing. Global duplicate detection uses a temporary SQLite index of 64-bit hashes; hash collisions and differences in textual formatting are limitations, so these are screening results rather than proof of semantic uniqueness.
+
+No records are automatically deleted. Missing arrival fields on cancelled flights can be structural; absent cause minutes are not automatically data corruption. Negative delay minutes represent early operations and are retained, as are extreme delays. Filling missing cause minutes with zero is only a summation convention, not evidence that the true contribution was zero. Full classification and missing-value rules are in [METHODS.md](docs/METHODS.md).
+
+### Engineered features
+
+`flight_outcome` combines validated cancellation/diversion flags with the arrival-delay flag; completed-flight minute/flag conflicts become unknown. A valid arrival-delay flag remains usable when arrival-delay minutes are missing. `Completed, not delayed ≥15 min` includes early arrivals and delays under 15 minutes.
+
+`recovery_minutes = DEP_DELAY - ARR_DELAY` measures schedule recovery among late-departing, completed flights. The existing distance bins are [0, 500), [500, 1000), [1000, 1500), [1500, 2000) and [2000, infinity) miles. They support descriptive comparison, not causal estimates of route length. `DAY_OF_WEEK` and `DEP_TIME_BLK` are supplied by BTS, not newly engineered features.
 
 ### Delay-Cause Shares
 
@@ -371,7 +425,9 @@ cd us-flight-delay-analysis
 ### 2. Install dependencies
 
 ```bash
-pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
 ### 3. Download the dataset
@@ -382,11 +438,13 @@ Download:
 bts_2025_07_to_2026_06.csv
 ```
 
-from the repository's **GitHub Releases** section and place it in:
+from the [v1.0-data Release](https://github.com/canyangxu/us-flight-delay-analysis/releases/tag/v1.0-data) and place it in:
 
 ```text
 data/bts_2025_07_to_2026_06.csv
 ```
+
+For rebuilding from the original monthly ZIPs, see the field list, folder layout and optional DuckDB workflow in [METHODS.md](docs/METHODS.md).
 
 ### 4. Validate the dataset
 
@@ -394,7 +452,7 @@ data/bts_2025_07_to_2026_06.csv
 python analysis/01_data_quality.py
 ```
 
-Expected coverage:
+Coverage verified in the full-data run:
 
 ```text
 7,043,316 records
@@ -414,6 +472,7 @@ python analysis/08_rq4_airport_delay_rates.py
 python analysis/09_rq4_airport_delay_fingerprints.py
 python analysis/10_rq5_best_time_to_fly.py
 python analysis/11_rq6_delay_recovery_by_distance.py
+python analysis/12_flight_outcomes_by_time.py
 ```
 
 Each analysis produces:
@@ -425,11 +484,28 @@ charts/<matching visualization>.png
 
 ---
 
+### 6. Run regression tests
+
+```bash
+# Optional for the Parquet merge and its regression test only:
+python -m pip install duckdb
+python -m unittest discover -s tests -v
+```
+
+Tests use temporary input/output directories. They cover classification edge cases, chunk equivalence, cross-chunk duplicates, unknown times, count conservation, empty-input/undefined rates and safe merging. The full release was used to run scripts 01, 03, 08 and 12; their reports and three regenerated figures are included. The remaining analyses were not rerun. The monthly-to-CSV/Parquet rebuild was tested on small ZIP fixtures, not independently reconstructed from 12 newly downloaded monthly files.
+
 ## Limitations
 
 This project is a **descriptive analysis** of observed BTS flight operations.
 
 The results identify patterns and associations but do not establish causal effects.
+
+- Findings are limited to this year, U.S. domestic operations and the reporting-carrier dataset's coverage; they do not predict an individual flight.
+- One row represents one flight, not a passenger-weighted measure of disruption.
+- Unadjusted airline/airport comparisons reflect routes, schedules, season and network structure as well as other factors; avoid assigning blame from these rankings.
+- Arrival-only rates omit cancellations and other flights without arrival records. The outcome analysis adds those records to the denominator, while keeping unknowns visible.
+- Early departures may impose transport, accommodation, work or caregiving costs and may not be available to all travelers.
+- A descriptive time association does not establish the improvement any traveler would obtain by changing departure time.
 
 For example, the increase in both overall delay risk and Late Aircraft Delay later in the day is consistent with disruption accumulating through the network, but the data alone do not prove that every evening delay was directly caused by an earlier flight.
 

@@ -186,7 +186,7 @@ ax.set_yticklabels(
 
 
 ax.set_title(
-    "Airport context matters: delay rates vary widely across major hubs",
+    "Arrival delay rates differ for flights departing major hubs",
     loc="left",
     fontsize=17,
     fontweight="bold",
@@ -199,7 +199,7 @@ ax.text(
     1.01,
     (
         "Top 20 origin airports by scheduled flight volume. "
-        "The airport is part of the delay environment—not just the airline."
+        "Rates describe flights departing each airport, not delays caused by that airport."
     ),
     transform=ax.transAxes,
     fontsize=10,
@@ -235,7 +235,7 @@ ax.text(
     0,
     -0.10,
     SOURCE_NOTE
-    + " Top 20 airports selected by scheduled origin flight volume.",
+    + " Denominator: valid arrival records for flights from each origin. Rankings are unadjusted for route, time and network.",
     transform=ax.transAxes,
     fontsize=8,
     color=GRAY
