@@ -1,0 +1,17 @@
+check,value
+input_rows,7043316
+cancelled_and_diverted,0
+completed_without_valid_arrival_flag,1
+completed_arrival_flag_delay_conflict,0
+completed_arr_delay_missing,1
+completed_arr_delay_invalid,0
+unknown_departure_time,0
+CANCELLED_missing,0
+CANCELLED_invalid,0
+DIVERTED_missing,0
+DIVERTED_invalid,0
+ARR_DEL15_missing,147033
+ARR_DEL15_invalid,0
+unparseable_or_missing_dates,0
+start_date,2025-07-01
+end_date,2026-06-30

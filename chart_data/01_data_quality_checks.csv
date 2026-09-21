@@ -1,0 +1,58 @@
+check,count,denominator,proportion,rule
+ACTUAL_ELAPSED_TIME_missing,147033,7043316,0.020875536466062293,Blank or missing field
+AIR_TIME_missing,147033,7043316,0.020875536466062293,Blank or missing field
+ARR_DEL15_invalid,0,7043316,0.0,Nonblank flag is not numeric 0 or 1
+ARR_DEL15_missing,147033,7043316,0.020875536466062293,Blank or missing field
+ARR_DELAY_missing,147033,7043316,0.020875536466062293,Blank or missing field
+ARR_TIME_BLK_missing,0,7043316,0.0,Blank or missing field
+ARR_TIME_missing,129328,7043316,0.018361805717647766,Blank or missing field
+CANCELLATION_CODE_missing,6915992,7043316,0.9819227193554854,Blank or missing field
+CANCELLED_invalid,0,7043316,0.0,Nonblank flag is not numeric 0 or 1
+CANCELLED_missing,0,7043316,0.0,Blank or missing field
+CARRIER_DELAY_missing,5497269,7043316,0.7804944432423592,Blank or missing field
+CRS_ARR_TIME_missing,0,7043316,0.0,Blank or missing field
+CRS_DEP_TIME_missing,0,7043316,0.0,Blank or missing field
+CRS_ELAPSED_TIME_missing,2,7043316,2.839571588155352e-07,Blank or missing field
+DAY_OF_MONTH_missing,0,7043316,0.0,Blank or missing field
+DAY_OF_WEEK_missing,0,7043316,0.0,Blank or missing field
+DEP_DEL15_missing,122911,7043316,0.01745072917358812,Blank or missing field
+DEP_DELAY_missing,122911,7043316,0.01745072917358812,Blank or missing field
+DEP_TIME_BLK_missing,0,7043316,0.0,Blank or missing field
+DEP_TIME_missing,122368,7043316,0.017373634804969704,Blank or missing field
+DEST_AIRPORT_ID_missing,0,7043316,0.0,Blank or missing field
+DEST_CITY_NAME_missing,0,7043316,0.0,Blank or missing field
+DEST_STATE_ABR_missing,0,7043316,0.0,Blank or missing field
+DEST_missing,0,7043316,0.0,Blank or missing field
+DISTANCE_missing,0,7043316,0.0,Blank or missing field
+DIVERTED_invalid,0,7043316,0.0,Nonblank flag is not numeric 0 or 1
+DIVERTED_missing,0,7043316,0.0,Blank or missing field
+FL_DATE_missing,0,7043316,0.0,Blank or missing field
+LATE_AIRCRAFT_DELAY_missing,5497269,7043316,0.7804944432423592,Blank or missing field
+MONTH_missing,0,7043316,0.0,Blank or missing field
+NAS_DELAY_missing,5497269,7043316,0.7804944432423592,Blank or missing field
+OP_CARRIER_FL_NUM_missing,0,7043316,0.0,Blank or missing field
+OP_UNIQUE_CARRIER_missing,0,7043316,0.0,Blank or missing field
+ORIGIN_AIRPORT_ID_missing,0,7043316,0.0,Blank or missing field
+ORIGIN_CITY_NAME_missing,0,7043316,0.0,Blank or missing field
+ORIGIN_STATE_ABR_missing,0,7043316,0.0,Blank or missing field
+ORIGIN_missing,0,7043316,0.0,Blank or missing field
+SECURITY_DELAY_missing,5497269,7043316,0.7804944432423592,Blank or missing field
+TAIL_NUM_missing,17409,7043316,0.002471705088909826,Blank or missing field
+TAXI_IN_missing,129328,7043316,0.018361805717647766,Blank or missing field
+TAXI_OUT_missing,126646,7043316,0.017981019167676134,Blank or missing field
+WEATHER_DELAY_missing,5497269,7043316,0.7804944432423592,Blank or missing field
+YEAR_missing,0,7043316,0.0,Blank or missing field
+cancelled_and_diverted,0,7043316,0.0,Both status flags equal 1
+candidate_key_duplicate_excess,0,7043316,0.0,"Repeated complete key hashes beyond first: FL_DATE, OP_UNIQUE_CARRIER, OP_CARRIER_FL_NUM, ORIGIN, DEST, CRS_DEP_TIME"
+candidate_key_incomplete_rows,0,7043316,0.0,Excluded from candidate-key check only; retained in all outcome counts
+completed_arr_delay_invalid,0,7043316,0.0,CANCELLED=DIVERTED=0 and nonblank ARR_DELAY is nonnumeric or nonfinite
+completed_arr_delay_missing,1,7043316,1.419785794077676e-07,CANCELLED=DIVERTED=0 and ARR_DELAY blank; valid ARR_DEL15 still classifies the flight
+completed_arrival_flag_delay_conflict,0,7043316,0.0,"CANCELLED=DIVERTED=0, valid ARR_DEL15 disagrees with finite ARR_DELAY >=15"
+completed_without_valid_arrival_flag,1,7043316,1.419785794077676e-07,CANCELLED=DIVERTED=0 but ARR_DEL15 is missing or not 0/1
+date_outside_expected_range,0,7043316,0.0,Parsed date outside 2025-07-01 through 2026-06-30
+date_parse_failures,0,7043316,0.0,Nonblank FL_DATE could not be parsed
+full_row_duplicate_excess,0,7043316,0.0,Repeated 64-bit full-row hashes beyond first occurrence; all columns as CSV strings; collision risk exists
+input_rows,7043316,7043316,1.0,All input records; no automatic row exclusions
+missing_expected_dates,0,365,0.0,Expected calendar dates with no records; investigate before declaring invalid
+missing_expected_months,0,12,0.0,Expected months with zero records
+unknown_departure_time,0,7043316,0.0,DEP_TIME_BLK missing or outside the published time-block list
